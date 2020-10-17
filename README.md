@@ -1,3 +1,5 @@
+# Forked From FoundryVTT-Drag-Upload by Cody Swendrowski <cody@swendrowski.us>
+
 ![](https://img.shields.io/badge/Foundry-v0.7.2-informational)
 [![](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-%243-orange)](https://www.buymeacoffee.com/T2tZvWJ)
 
@@ -21,18 +23,5 @@ Otherwise, it will be treated as an Image and created based on the current activ
 
 ## Changelog
 
-### v1.1.0
-* https://github.com/cswendrowski/FoundryVTT-Drag-Upload/issues/1 - Added full support for all audio types (except WEBM, because that's almost always an animated image)
-* https://github.com/cswendrowski/FoundryVTT-Drag-Upload/issues/2 - When WEBM is dragged, only set the Token and not the Actor
-
-### v1.2.0
-Thanks to [Itamarcu](https://github.com/itamarcu) for this wonderful addition!
-You can now drag upload images straight from a webbrowser. **This is not supported in Firefox**
-![](./draguploadfromweb.gif)
-
-### v1.3.0
-Thanks to [Itamarcu](https://github.com/itamarcu), you can now create Actorless tokens!
-
-### v1.4.1
-We now integrate with the upcoming Isometric module!
-![](./draguploadiso.gif)
+### v1.0.0
+Initial release with support for uploading to S3 instead of the local file system
