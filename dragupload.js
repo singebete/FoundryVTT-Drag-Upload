@@ -1,9 +1,25 @@
 (() => { })();
 
+let SOURCE_LOCAL = "data"
+let SOURCE_S3 = "s3"
+let SOURCE_FORGEVTT = "forgevtt"
+
+let REQUIRED_FOLDERS = [
+	"dragupload/uploaded/tokens",
+	"dragupload/uploaded/tiles",
+	"dragupload/uploaded/ambient",
+	"dragupload/uploaded/journals"
+]
+
+var source_setting = SOURCE_LOCAL
+
 Hooks.once('ready', async function() {
     console.log("Ready!");
+	
+	source_setting = SOURCE_S3;
 
-    await createFoldersIfMissing();
+	if (source_setting != SOURCE_S3)
+    	await createFoldersIfMissing();
 
     new DragDrop({ 
         callbacks: { 
@@ -13,7 +29,16 @@ Hooks.once('ready', async function() {
     .bind($("#board")[0]);
 });
 
+function determineSource() {
+    if (typeof ForgeVTT != "undefined" && ForgeVTT.usingTheForge) {
+        return SOURCE_FORGEVTT;
+    }
+	
+	else return source_setting;
+}
+
 async function createFoldersIfMissing() {
+	//make dynamic based on required folders
     await createFolderIfMissing(".", "dragupload");
     await createFolderIfMissing("dragupload", "dragupload/uploaded");
     await createFolderIfMissing("dragupload/uploaded", "dragupload/uploaded/tokens");
@@ -22,16 +47,12 @@ async function createFoldersIfMissing() {
     await createFolderIfMissing("dragupload/uploaded", "dragupload/uploaded/journals");
 }
 
-async function createFolderIfMissing(target, folderPath) {
-    var source = "data";
-    if (typeof ForgeVTT != "undefined" && ForgeVTT.usingTheForge) {
-        source = "forgevtt";
-    }
-    var base = await FilePicker.browse(source, folderPath);
+async function createFolderIfMissing(target, folderPath) {    
+    var base = await FilePicker.browse(source_setting, folderPath);
     console.log(base.target);
     if (base.target == target)
     {
-        await FilePicker.createDirectory(source, folderPath);
+        await FilePicker.createDirectory(source_setting, folderPath);
     }
 }
 
@@ -120,15 +141,11 @@ async function HandleAudioFile(event, file) {
 }
 
 async function CreateAmbientAudio(event, file) {
-    var source = "data";
-    if (typeof ForgeVTT != "undefined" && ForgeVTT.usingTheForge) {
-        source = "forgevtt";
-    }
     let response
     if (file.isExternalUrl) {
         response = {path: file.url}
     } else {
-        response = await FilePicker.upload(source, "dragupload/uploaded/ambient", file, {});
+        response = await FilePicker.upload(source_setting, "dragupload/uploaded/ambient", file, {});
     }
 
     var data = {
@@ -147,15 +164,11 @@ async function CreateAmbientAudio(event, file) {
 }
 
 async function CreateTile(event, file) {
-    var source = "data";
-    if (typeof ForgeVTT != "undefined" && ForgeVTT.usingTheForge) {
-        source = "forgevtt";
-    }
     let response
     if (file.isExternalUrl) {
         response = {path: file.url}
     } else {
-        response = await FilePicker.upload(source, "dragupload/uploaded/tiles", file, {});
+        response = await FilePicker.upload(source_setting, "dragupload/uploaded/tiles", file, {});
     }
     console.log(response);
 
@@ -180,15 +193,11 @@ async function CreateTile(event, file) {
 }
 
 async function CreateJournalPin(event, file) {
-    var source = "data";
-    if (typeof ForgeVTT != "undefined" && ForgeVTT.usingTheForge) {
-        source = "forgevtt";
-    }
     let response
     if (file.isExternalUrl) {
         response = {path: file.url}
     } else {
-        response = await FilePicker.upload(source, "dragupload/uploaded/journals", file, {});
+        response = await FilePicker.upload(source_setting, "dragupload/uploaded/journals", file, {});
     }
     console.log(response);
 
@@ -217,15 +226,11 @@ async function CreateJournalPin(event, file) {
 }
 
 async function CreateActor(event, file) {
-    var source = "data";
-    if (typeof ForgeVTT != "undefined" && ForgeVTT.usingTheForge) {
-        source = "forgevtt";
-    }
     let response
     if (file.isExternalUrl) {
         response = {path: file.url}
     } else {
-        response = await FilePicker.upload(source, "dragupload/uploaded/tokens", file, {});
+        response = await FilePicker.upload(source_setting, "dragupload/uploaded/tokens", file, {});
     }
     console.log(response);
 
