@@ -4,12 +4,12 @@ let SOURCE_LOCAL = "data"
 let SOURCE_S3 = "s3"
 let SOURCE_FORGEVTT = "forgevtt"
 
-let REQUIRED_FOLDERS = [
-	"dragupload/uploaded/tokens",
-	"dragupload/uploaded/tiles",
-	"dragupload/uploaded/ambient",
-	"dragupload/uploaded/journals"
-]
+let REQUIRED_FOLDERS = {
+	"tokens": "singebete-foundry/dragupload/uploaded/tokens",
+	"tiles": "singebete-foundry/dragupload/uploaded/tiles",
+	"ambient": "singebete-foundry/dragupload/uploaded/ambient",
+	"journals": "singebete-foundry/dragupload/uploaded/journals"
+}
 
 var source_setting = SOURCE_LOCAL
 
@@ -41,10 +41,10 @@ async function createFoldersIfMissing() {
 	//make dynamic based on required folders
     await createFolderIfMissing(".", "dragupload");
     await createFolderIfMissing("dragupload", "dragupload/uploaded");
-    await createFolderIfMissing("dragupload/uploaded", "dragupload/uploaded/tokens");
-    await createFolderIfMissing("dragupload/uploaded", "dragupload/uploaded/tiles");
-    await createFolderIfMissing("dragupload/uploaded", "dragupload/uploaded/ambient");
-    await createFolderIfMissing("dragupload/uploaded", "dragupload/uploaded/journals");
+    await createFolderIfMissing("dragupload/uploaded", REQUIRED_FOLDERS["tokens"]);
+    await createFolderIfMissing("dragupload/uploaded", REQUIRED_FOLDERS["tiles"]);
+    await createFolderIfMissing("dragupload/uploaded", REQUIRED_FOLDERS["ambient"]);
+    await createFolderIfMissing("dragupload/uploaded", REQUIRED_FOLDERS["journals"]);
 }
 
 async function createFolderIfMissing(target, folderPath) {    
@@ -145,7 +145,7 @@ async function CreateAmbientAudio(event, file) {
     if (file.isExternalUrl) {
         response = {path: file.url}
     } else {
-        response = await FilePicker.upload(source_setting, "dragupload/uploaded/ambient", file, {});
+        response = await FilePicker.upload(source_setting, REQUIRED_FOLDERS["ambient"], file, {});
     }
 
     var data = {
@@ -168,7 +168,7 @@ async function CreateTile(event, file) {
     if (file.isExternalUrl) {
         response = {path: file.url}
     } else {
-        response = await FilePicker.upload(source_setting, "dragupload/uploaded/tiles", file, {});
+        response = await FilePicker.upload(source_setting, REQUIRED_FOLDERS["tiles"], file, {});
     }
     console.log(response);
 
@@ -197,7 +197,7 @@ async function CreateJournalPin(event, file) {
     if (file.isExternalUrl) {
         response = {path: file.url}
     } else {
-        response = await FilePicker.upload(source_setting, "dragupload/uploaded/journals", file, {});
+        response = await FilePicker.upload(source_setting, REQUIRED_FOLDERS["journals"], file, {});
     }
     console.log(response);
 
@@ -230,7 +230,7 @@ async function CreateActor(event, file) {
     if (file.isExternalUrl) {
         response = {path: file.url}
     } else {
-        response = await FilePicker.upload(source_setting, "dragupload/uploaded/tokens", file, {});
+        response = await FilePicker.upload(source_setting, REQUIRED_FOLDERS["tokens"], file, {});
     }
     console.log(response);
 

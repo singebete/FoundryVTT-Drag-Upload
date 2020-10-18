@@ -2,7 +2,7 @@
   "name": "dragupload-s3",
   "title": "Drag Upload (Get Over Here!...and into S3)",
   "description": "Adds the ability to drag files onto Foundry to automatically create Tokens, Tiles, Journal Pins, and Ambient Audio. They are stored in S3",
-  "version": "1.4.1-s3",
+  "version": "1.4.2-s3",
   "minimumCoreVersion": "0.6.2",
   "compatibleCoreVersion": "0.7.2",
   "authors": [
@@ -27,6 +27,6 @@
   "languages": [
   ],
   "url": "https://github.com/singebete/FoundryVTT-Drag-Upload",
-  "manifest": "https://github.com/singebete/FoundryVTT-Drag-Upload/releases/download/1.4.1-s3/module.json",
-  "download": "https://github.com/singebete/FoundryVTT-Drag-Upload/releases/download/1.4.1-s3/module.zip"
+  "manifest": "https://github.com/singebete/FoundryVTT-Drag-Upload/releases/download/1.4.2-s3/module.json",
+  "download": "https://github.com/singebete/FoundryVTT-Drag-Upload/releases/download/1.4.2-s3/module.zip"
 }
