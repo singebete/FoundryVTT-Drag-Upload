@@ -1,25 +1,32 @@
 (() => { })();
 
-let SOURCE_LOCAL = "data"
-let SOURCE_S3 = "s3"
-let SOURCE_FORGEVTT = "forgevtt"
+let SOURCE_LOCAL = "data";
+let SOURCE_S3 = "s3";
+let SOURCE_FORGEVTT = "forgevtt";
 
 let REQUIRED_FOLDERS = {
-	"tokens": "singebete-foundry/dragupload/uploaded/tokens",
-	"tiles": "singebete-foundry/dragupload/uploaded/tiles",
-	"ambient": "singebete-foundry/dragupload/uploaded/ambient",
-	"journals": "singebete-foundry/dragupload/uploaded/journals"
-}
+    "tokens": "dragupload/uploaded/tokens",
+    "tiles": "dragupload/uploaded/tiles",
+    "ambient": "dragupload/uploaded/ambient",
+    "journals": "dragupload/uploaded/journals"
+};
 
-var source_setting = SOURCE_LOCAL
+var source_setting = SOURCE_LOCAL;
+let file_picker_options;
+let bucket_name = "singebete-foundry"
 
 Hooks.once('ready', async function() {
     console.log("Ready!");
-	
-	source_setting = SOURCE_S3;
 
-	if (source_setting != SOURCE_S3)
-    	await createFoldersIfMissing();
+    source_setting = SOURCE_S3;
+
+    if (source_setting != SOURCE_S3) {
+        file_picker_options = {};
+        await createFoldersIfMissing();
+    } else {
+        file_picker_options = {bucket: bucket_name};
+    }
+        
 
     new DragDrop({ 
         callbacks: { 
@@ -33,8 +40,8 @@ function determineSource() {
     if (typeof ForgeVTT != "undefined" && ForgeVTT.usingTheForge) {
         return SOURCE_FORGEVTT;
     }
-	
-	else return source_setting;
+
+    else return source_setting;
 }
 
 async function createFoldersIfMissing() {
@@ -143,9 +150,9 @@ async function HandleAudioFile(event, file) {
 async function CreateAmbientAudio(event, file) {
     let response
     if (file.isExternalUrl) {
-        response = {path: file.url}
+        response = {path: file.url};
     } else {
-        response = await FilePicker.upload(source_setting, REQUIRED_FOLDERS["ambient"], file, {});
+        response = await FilePicker.upload(source_setting, REQUIRED_FOLDERS["ambient"], file, file_picker_options);
     }
 
     var data = {
@@ -166,9 +173,9 @@ async function CreateAmbientAudio(event, file) {
 async function CreateTile(event, file) {
     let response
     if (file.isExternalUrl) {
-        response = {path: file.url}
+        response = {path: file.url};
     } else {
-        response = await FilePicker.upload(source_setting, REQUIRED_FOLDERS["tiles"], file, {});
+        response = await FilePicker.upload(source_setting, REQUIRED_FOLDERS["tiles"], file, file_picker_options);
     }
     console.log(response);
 
@@ -195,9 +202,9 @@ async function CreateTile(event, file) {
 async function CreateJournalPin(event, file) {
     let response
     if (file.isExternalUrl) {
-        response = {path: file.url}
+        response = {path: file.url};
     } else {
-        response = await FilePicker.upload(source_setting, REQUIRED_FOLDERS["journals"], file, {});
+        response = await FilePicker.upload(source_setting, REQUIRED_FOLDERS["journals"], file, file_picker_options);
     }
     console.log(response);
 
@@ -228,9 +235,9 @@ async function CreateJournalPin(event, file) {
 async function CreateActor(event, file) {
     let response
     if (file.isExternalUrl) {
-        response = {path: file.url}
+        response = {path: file.url};
     } else {
-        response = await FilePicker.upload(source_setting, REQUIRED_FOLDERS["tokens"], file, {});
+        response = await FilePicker.upload(source_setting, REQUIRED_FOLDERS["tokens"], file, file_picker_options);
     }
     console.log(response);
 
@@ -278,7 +285,7 @@ async function CreateActor(event, file) {
 async function CreateActorWithType(event, data, tokenImageData, type) {
     let createdType = type
     if (type === "actorless") {
-        createdType = Object.keys(CONFIG.Actor.sheetClasses)[0]
+        createdType = Object.keys(CONFIG.Actor.sheetClasses)[0];
     }
     const actor = await Actor.create(
         {
@@ -331,7 +338,6 @@ function CreateImgData(event, response) {
 }
 
 function convertXYtoCanvas(data, event) {
-
     // Acquire the cursor position transformed to Canvas coordinates
     const [x, y] = [event.clientX, event.clientY];
     const t = canvas.stage.worldTransform;
