@@ -4,23 +4,36 @@ let SOURCE_LOCAL = "data";
 let SOURCE_S3 = "s3";
 let SOURCE_FORGEVTT = "forgevtt";
 
-let REQUIRED_FOLDERS = {
-    "tokens": "dragupload/uploaded/tokens",
-    "tiles": "dragupload/uploaded/tiles",
-    "ambient": "dragupload/uploaded/ambient",
-    "journals": "dragupload/uploaded/journals"
+let CLIENT_SETTINGS = {
+    moduleName: "dragupload",
+    configured: "configured",
+    uploadLocation: "uploadLocation",
+    s3BucketName: "s3BucketName"
 };
 
-var source_setting = SOURCE_LOCAL;
+let REQUIRED_FOLDERS = {
+    tokens: "dragupload/uploaded/tokens",
+    tiles: "dragupload/uploaded/tiles",
+    ambient: "dragupload/uploaded/ambient",
+    journals: "dragupload/uploaded/journals"
+};
+
 let file_picker_options;
 let bucket_name = "singebete-foundry"
 
 Hooks.once('ready', async function() {
     console.log("Ready!");
+    
+    if (!game.settings.get(CLIENT_SETTINGS.moduleName, CLIENT_SETTINGS.configured)) {
+        registerConfigurationValues();
+        showConfigurationModal(initFunction);
+    } else {
+        initFunction();
+    }
+});
 
-    source_setting = SOURCE_S3;
-
-    if (source_setting != SOURCE_S3) {
+function initFunction() {    
+    if (determineSource() != SOURCE_S3) {
         file_picker_options = {};
         await createFoldersIfMissing();
     } else {
@@ -34,32 +47,65 @@ Hooks.once('ready', async function() {
         } 
     })
     .bind($("#board")[0]);
-});
+}
+
+function registerConfigurationValues() {
+    game.settings.register(CLIENT_SETTINGS.moduleName, CLIENT_SETTINGS.configured, {
+      name: "Configured",
+      hint: "Marker for if this configuration has been run.",
+      scope: "world",      // This specifies a world-level setting
+      config: false,        // This specifies that the setting appears in the configuration view
+      type: Boolean,
+      default: true,         // The default value for the setting
+    });
+    
+    game.settings.register(CLIENT_SETTINGS.moduleName, CLIENT_SETTINGS.uploadLocation, {
+      name: "Upload Location",
+      hint: "If files should be stored on the server or in S3.",
+      scope: "world",      // This specifies a world-level setting
+      config: true,        // This specifies that the setting appears in the configuration view
+      type: String,
+      choices: {             // If choices are defined, the resulting setting will be a select menu
+          SOURCE_LOCAL: SOURCE_LOCAL,
+          SOURCE_S3: SOURCE_S3
+      }
+      default: SOURCE_LOCAL         // The default value for the setting
+    });
+    
+    game.settings.register(CLIENT_SETTINGS.moduleName, CLIENT_SETTINGS.s3BucketName, {
+      name: "Bucket Name",
+      hint: "If using S3 the bucket name to upload to.",
+      scope: "world",      // This specifies a world-level setting
+      config: true,        // This specifies that the setting appears in the configuration view
+      type: String
+    });
+}
 
 function determineSource() {
-    if (typeof ForgeVTT != "undefined" && ForgeVTT.usingTheForge) {
+    let settings_source = game.settings.get(CLIENT_SETTINGS.moduleName, CLIENT_SETTINGS.uploadLocation)
+    if (settings_source != SOURCE_S3 && typeof ForgeVTT != "undefined" && ForgeVTT.usingTheForge) {
         return SOURCE_FORGEVTT;
     }
 
-    else return source_setting;
+    else return settings_source;
 }
 
 async function createFoldersIfMissing() {
 	//make dynamic based on required folders
     await createFolderIfMissing(".", "dragupload");
     await createFolderIfMissing("dragupload", "dragupload/uploaded");
-    await createFolderIfMissing("dragupload/uploaded", REQUIRED_FOLDERS["tokens"]);
-    await createFolderIfMissing("dragupload/uploaded", REQUIRED_FOLDERS["tiles"]);
-    await createFolderIfMissing("dragupload/uploaded", REQUIRED_FOLDERS["ambient"]);
-    await createFolderIfMissing("dragupload/uploaded", REQUIRED_FOLDERS["journals"]);
+    await createFolderIfMissing("dragupload/uploaded", REQUIRED_FOLDERS.tokens);
+    await createFolderIfMissing("dragupload/uploaded", REQUIRED_FOLDERS.tiles);
+    await createFolderIfMissing("dragupload/uploaded", REQUIRED_FOLDERS.ambient);
+    await createFolderIfMissing("dragupload/uploaded", REQUIRED_FOLDERS.journals);
 }
 
 async function createFolderIfMissing(target, folderPath) {    
-    var base = await FilePicker.browse(source_setting, folderPath);
+    var base = await FilePicker.browse(determineSource(), folderPath);
     console.log(base.target);
     if (base.target == target)
     {
-        await FilePicker.createDirectory(source_setting, folderPath);
+        await FilePicker.createDirectory(determineSource(), folderPath);
     }
 }
 
@@ -152,7 +198,7 @@ async function CreateAmbientAudio(event, file) {
     if (file.isExternalUrl) {
         response = {path: file.url};
     } else {
-        response = await FilePicker.upload(source_setting, REQUIRED_FOLDERS["ambient"], file, file_picker_options);
+        response = await FilePicker.upload(determineSource(), REQUIRED_FOLDERS.ambient, file, file_picker_options);
     }
 
     var data = {
@@ -175,7 +221,7 @@ async function CreateTile(event, file) {
     if (file.isExternalUrl) {
         response = {path: file.url};
     } else {
-        response = await FilePicker.upload(source_setting, REQUIRED_FOLDERS["tiles"], file, file_picker_options);
+        response = await FilePicker.upload(determineSource(), REQUIRED_FOLDERS.tiles, file, file_picker_options);
     }
     console.log(response);
 
@@ -204,7 +250,7 @@ async function CreateJournalPin(event, file) {
     if (file.isExternalUrl) {
         response = {path: file.url};
     } else {
-        response = await FilePicker.upload(source_setting, REQUIRED_FOLDERS["journals"], file, file_picker_options);
+        response = await FilePicker.upload(determineSource(), REQUIRED_FOLDERS.journals, file, file_picker_options);
     }
     console.log(response);
 
@@ -237,7 +283,7 @@ async function CreateActor(event, file) {
     if (file.isExternalUrl) {
         response = {path: file.url};
     } else {
-        response = await FilePicker.upload(source_setting, REQUIRED_FOLDERS["tokens"], file, file_picker_options);
+        response = await FilePicker.upload(determineSource(), REQUIRED_FOLDERS.tokens, file, file_picker_options);
     }
     console.log(response);
 
